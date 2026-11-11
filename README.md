@@ -13,7 +13,7 @@ URL Excalidraw - https://dbc-dd14da65-ca37.cloud.databricks.com/editor/files/255
 ## 🏗️ Arquitetura
 
 ```
-Arquivos brutos (pasta no Databricks)
+Arquivos brutos (pasta no Databricks - raw_data)
         │
         ▼
    [Bronze]  → ingestão fiel dos arquivos, sem alterações
