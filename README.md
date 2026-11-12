@@ -1,7 +1,7 @@
 # Projeto-queimadas
 ## 📌 Visão geral
 
-- **Objetivo:** Consolidar arquivos anuais de queimadas para análises no Power BI
+- **Objetivo:** Consolidar arquivos anuais de queimadas para análises em ferramentas de BI's
 - **Fonte dos dados:** https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/anual/Brasil_sat_ref/
 - **Destino:** tabelas Delta consumidas pelo Power BI
 - **Frequência de atualização:** Diáriamente pelos workflows do Databricks
