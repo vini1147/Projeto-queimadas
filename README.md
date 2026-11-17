@@ -25,7 +25,7 @@ Arquivos brutos (pasta no Databricks - raw_data)
    [Gold]    → tabelas agregadas e modeladas para análise
         │
         ▼
-    Power BI
+    Power BI | Dashboard (Databricks)
 ```
 
 ## 📂 Estrutura do projeto
