@@ -7,7 +7,7 @@
 - **Frequência de atualização:** Diáriamente pelos workflows do Databricks
 
 #### Planejamento/Estruturação do projeto
-![Arquitetura do projeto](documentos/Excalidraw - Arquitetura projeto queimadas.png)
+![Arquitetura do projeto](imagens/Excalidraw - Arquitetura projeto queimadas.png)
 
 ## 🧰 Tecnologias e ferramentas
 
