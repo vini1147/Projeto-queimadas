@@ -1,0 +1,220 @@
+/// Dimensão calendário (Power Query). Intervalo: p_DataInicial até 31/12 do ano corrente.
+table dim_calendario
+	lineageTag: d249c89c-ec29-426b-bce7-0748b3502853
+	dataCategory: Time
+
+	column Data
+		dataType: dateTime
+		isUnique
+		isKey
+		formatString: dd/mm/yyyy
+		lineageTag: d759207f-6913-43e5-ae10-062cf35c08e8
+		summarizeBy: none
+		sourceColumn: Data
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: b872d59e-ce78-4d48-8115-bff741b87a46
+		summarizeBy: none
+		sourceColumn: Ano
+
+	column 'Semestre Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 30a682e2-7e84-4124-88be-84222670e250
+		summarizeBy: none
+		sourceColumn: Semestre Num
+
+	column Semestre
+		dataType: string
+		lineageTag: b779f420-ac72-47cb-86e1-9a2b39a2a75b
+		summarizeBy: none
+		sourceColumn: Semestre
+		sortByColumn: 'Semestre Num'
+
+	column 'Trimestre Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e60acd53-a37b-4e96-8231-e3a3fd9ac074
+		summarizeBy: none
+		sourceColumn: Trimestre Num
+
+	column Trimestre
+		dataType: string
+		lineageTag: 57303aee-d887-4041-aaf6-f520e5f40b57
+		summarizeBy: none
+		sourceColumn: Trimestre
+		sortByColumn: 'Trimestre Num'
+
+	column 'Mês Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d672a0e7-b478-4805-a29d-c13b9e01a4ea
+		summarizeBy: none
+		sourceColumn: Mês Num
+
+	column Mês
+		dataType: string
+		lineageTag: 9ab216d3-f655-4105-8164-9e008231c7c0
+		summarizeBy: none
+		sourceColumn: Mês
+		sortByColumn: 'Mês Num'
+
+	column 'Mês Abrev'
+		dataType: string
+		lineageTag: a9eec900-5bf3-4976-a1a3-140e2bfb3370
+		summarizeBy: none
+		sourceColumn: Mês Abrev
+		sortByColumn: 'Mês Num'
+
+	column 'Ano Mês Num'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e947356-2a7c-4836-9606-9f9abee10af8
+		summarizeBy: none
+		sourceColumn: Ano Mês Num
+
+		changedProperty = IsHidden
+
+	column Mês/Ano
+		dataType: string
+		lineageTag: eb9be237-cd82-49b4-b945-f15c10cee933
+		summarizeBy: none
+		sourceColumn: Mês/Ano
+		sortByColumn: 'Ano Mês Num'
+
+	column 'Início do Mês'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: d22cffd2-6967-4eeb-b00f-444cf36328d9
+		summarizeBy: none
+		sourceColumn: Início do Mês
+
+	column 'Fim do Mês'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 024a8761-a401-4746-8355-982bf22e6102
+		summarizeBy: none
+		sourceColumn: Fim do Mês
+
+	column Dia
+		dataType: int64
+		formatString: 0
+		lineageTag: 5bd716ea-b2bf-4e1e-94f9-5001509fd780
+		summarizeBy: none
+		sourceColumn: Dia
+
+	column 'Dia do Ano'
+		dataType: int64
+		formatString: 0
+		lineageTag: e97ea1eb-2a07-4bc2-be31-7c45405bdc55
+		summarizeBy: none
+		sourceColumn: Dia do Ano
+
+	column 'Semana do Ano'
+		dataType: int64
+		formatString: 0
+		lineageTag: 14851b70-4deb-49f8-95f8-659ed0ed0b94
+		summarizeBy: none
+		sourceColumn: Semana do Ano
+
+	column 'Dia da Semana Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8d27bbc6-58ad-4efd-b1f0-c225974fea40
+		summarizeBy: none
+		sourceColumn: Dia da Semana Num
+
+	column 'Dia da Semana'
+		dataType: string
+		lineageTag: f498db31-ca4f-4367-8ebb-ae3aefcfd66f
+		summarizeBy: none
+		sourceColumn: Dia da Semana
+		sortByColumn: 'Dia da Semana Num'
+
+	column 'Dia da Semana Abrev'
+		dataType: string
+		lineageTag: a0cb28fa-9c88-4a4c-8a1b-e8e2189517aa
+		summarizeBy: none
+		sourceColumn: Dia da Semana Abrev
+		sortByColumn: 'Dia da Semana Num'
+
+	column 'Tipo de Dia'
+		dataType: string
+		lineageTag: ab3de7c9-5152-4f2d-af80-6e63a3395a6e
+		summarizeBy: none
+		sourceColumn: Tipo de Dia
+
+	column 'Offset Ano'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d36d2e75-3419-4925-b97d-f6da024cb2f4
+		summarizeBy: none
+		sourceColumn: Offset Ano
+
+	column 'Offset Mês'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9fa1652e-a23b-4762-9402-eca774f6c668
+		summarizeBy: none
+		sourceColumn: Offset Mês
+
+	partition dim_calendario = m
+		mode: import
+		source =
+				let
+				    // ===== Parâmetros =====
+				    Hoje         = Date.From(DateTime.LocalNow()),
+				    DataInicial  = p_DataInicial,
+				    DataFinal    = Date.EndOfYear(Hoje),
+				    Cultura      = "pt-BR",
+				
+				    // ===== Função auxiliar: primeira letra maiúscula =====
+				    Cap = (t as text) as text => Text.Upper(Text.Start(t, 1)) & Text.Range(t, 1),
+				
+				    // ===== Lista de datas =====
+				    QtdDias = Duration.Days(DataFinal - DataInicial) + 1,
+				    Datas   = List.Dates(DataInicial, QtdDias, #duration(1, 0, 0, 0)),
+				    Tabela  = Table.FromList(Datas, Splitter.SplitByNothing(), {"Data"}, null, ExtraValues.Error),
+				    Tipada  = Table.TransformColumnTypes(Tabela, {{"Data", type date}}),
+				
+				    // ===== Ano / Semestre / Trimestre =====
+				    Ano           = Table.AddColumn(Tipada, "Ano", each Date.Year([Data]), Int64.Type),
+				    SemestreNum   = Table.AddColumn(Ano, "Semestre Num", each if Date.Month([Data]) <= 6 then 1 else 2, Int64.Type),
+				    Semestre      = Table.AddColumn(SemestreNum, "Semestre", each "S" & Text.From([Semestre Num]), type text),
+				    TrimestreNum  = Table.AddColumn(Semestre, "Trimestre Num", each Date.QuarterOfYear([Data]), Int64.Type),
+				    Trimestre     = Table.AddColumn(TrimestreNum, "Trimestre", each "T" & Text.From([Trimestre Num]), type text),
+				
+				    // ===== Mês =====
+				    MesNum        = Table.AddColumn(Trimestre, "Mês Num", each Date.Month([Data]), Int64.Type),
+				    Mes           = Table.AddColumn(MesNum, "Mês", each Cap(Date.MonthName([Data], Cultura)), type text),
+				    MesAbrev      = Table.AddColumn(Mes, "Mês Abrev", each Text.Start([Mês], 3), type text),
+				    AnoMesNum     = Table.AddColumn(MesAbrev, "Ano Mês Num", each [Ano] * 100 + [Mês Num], Int64.Type),
+				    MesAno        = Table.AddColumn(AnoMesNum, "Mês/Ano", each [Mês Abrev] & "/" & Text.From([Ano]), type text),
+				    InicioMes     = Table.AddColumn(MesAno, "Início do Mês", each Date.StartOfMonth([Data]), type date),
+				    FimMes        = Table.AddColumn(InicioMes, "Fim do Mês", each Date.EndOfMonth([Data]), type date),
+				
+				    // ===== Dia =====
+				    Dia           = Table.AddColumn(FimMes, "Dia", each Date.Day([Data]), Int64.Type),
+				    DiaAno        = Table.AddColumn(Dia, "Dia do Ano", each Date.DayOfYear([Data]), Int64.Type),
+				    SemanaAno     = Table.AddColumn(DiaAno, "Semana do Ano", each Date.WeekOfYear([Data], Day.Monday), Int64.Type),
+				
+				    // ===== Dia da semana (1 = segunda ... 7 = domingo) =====
+				    DiaSemNum     = Table.AddColumn(SemanaAno, "Dia da Semana Num", each Date.DayOfWeek([Data], Day.Monday) + 1, Int64.Type),
+				    DiaSem        = Table.AddColumn(DiaSemNum, "Dia da Semana", each Cap(Text.Replace(Date.DayOfWeekName([Data], Cultura), "-feira", "")), type text),
+				    DiaSemAbrev   = Table.AddColumn(DiaSem, "Dia da Semana Abrev", each Text.Start([Dia da Semana], 3), type text),
+				    TipoDia       = Table.AddColumn(DiaSemAbrev, "Tipo de Dia", each if [Dia da Semana Num] >= 6 then "Fim de semana" else "Dia útil", type text),
+				
+				    // ===== Colunas relativas (filtros dinâmicos: 0 = atual, -1 = anterior) =====
+				    OffsetAno     = Table.AddColumn(TipoDia, "Offset Ano", each [Ano] - Date.Year(Hoje), Int64.Type),
+				    OffsetMes     = Table.AddColumn(OffsetAno, "Offset Mês", each ([Ano] * 12 + [Mês Num]) - (Date.Year(Hoje) * 12 + Date.Month(Hoje)), Int64.Type)
+				in
+				    OffsetMes
+

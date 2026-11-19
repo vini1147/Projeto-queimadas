@@ -1,0 +1,8 @@
+relationship a33ccf17-ebaa-bae7-4911-6bb53f33ae10
+	fromColumn: gold_queimadas.hora_pas
+	toColumn: dim_hora.Hora
+
+relationship gold_queimadas_data_pas_dim_calendario_Data
+	fromColumn: gold_queimadas.data_pas
+	toColumn: dim_calendario.Data
+

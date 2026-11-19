@@ -1,0 +1,155 @@
+table gold_queimadas
+	lineageTag: 189cf0b6-7dd5-4352-9ec6-12115f57319c
+
+	column latitude
+		dataType: double
+		lineageTag: 548e7c51-766e-47cd-b386-8f1151d47f33
+		summarizeBy: sum
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		lineageTag: 1d85fdaf-f3ed-461e-9bb1-b2e814173a5d
+		summarizeBy: sum
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column data_pas
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5712248d-8a97-4989-883a-fc67469ee0f9
+		summarizeBy: none
+		sourceColumn: data_pas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column satelite
+		dataType: string
+		lineageTag: 37726f5a-1cb8-4179-a4f4-9c1565748a05
+		summarizeBy: none
+		sourceColumn: satelite
+
+		annotation SummarizationSetBy = Automatic
+
+	column pais
+		dataType: string
+		lineageTag: 1ab740dc-c683-4597-a409-b45c67fd0474
+		summarizeBy: none
+		sourceColumn: pais
+
+		annotation SummarizationSetBy = Automatic
+
+	column estado
+		dataType: string
+		lineageTag: 9e44ac7c-7e52-468d-97d4-7d17e5e05e78
+		summarizeBy: none
+		sourceColumn: estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column municipio
+		dataType: string
+		lineageTag: 970545fa-3c2a-4980-9766-d0db77c4a4de
+		summarizeBy: none
+		sourceColumn: municipio
+
+		annotation SummarizationSetBy = Automatic
+
+	column bioma
+		dataType: string
+		lineageTag: 815f16af-a5e8-4953-a0db-f3d496e4e0f8
+		summarizeBy: none
+		sourceColumn: bioma
+
+		annotation SummarizationSetBy = Automatic
+
+	column numero_dias_sem_chuva
+		dataType: int64
+		formatString: 0
+		lineageTag: a799a6bf-c982-450b-a623-0b168f64f8cf
+		summarizeBy: sum
+		sourceColumn: numero_dias_sem_chuva
+
+		annotation SummarizationSetBy = Automatic
+
+	column precipitacao
+		dataType: double
+		lineageTag: 5d1e0da7-71e1-4576-9807-566fc6f9b1f3
+		summarizeBy: sum
+		sourceColumn: precipitacao
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column risco_fogo
+		dataType: double
+		lineageTag: 8828d7f1-22d1-4890-b561-ad000b9d1d72
+		summarizeBy: sum
+		sourceColumn: risco_fogo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column id_area_industrial
+		dataType: int64
+		formatString: 0
+		lineageTag: 97650fd8-c16b-4eaf-80f2-c59dba81c1ef
+		summarizeBy: sum
+		sourceColumn: id_area_industrial
+
+		annotation SummarizationSetBy = Automatic
+
+	column frp
+		dataType: double
+		lineageTag: 086eb05a-58d8-4769-8b9a-b2608bda64ae
+		summarizeBy: sum
+		sourceColumn: frp
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column hora_pas
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: 594a40a6-f450-46c3-997e-3373e9f0d63d
+		summarizeBy: none
+		sourceColumn: hora_pas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column classe_risco_fogo
+		dataType: string
+		lineageTag: 122062ea-034c-486b-ad62-90a2ed4a890d
+		summarizeBy: none
+		sourceColumn: classe_risco_fogo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gold_queimadas = m
+		mode: import
+		source =
+				let
+				  Origem = DatabricksMultiCloud.Catalogs("dbc-dd14da65-ca37.cloud.databricks.com", "/sql/1.0/warehouses/30a7a259d087d689", [Catalog = null, Database = null, QueryTags = null, EnableAutomaticProxyDiscovery = "enabled", Implementation = "2.0", Protocol = null]),
+				  nav1 = Origem{[Name = "proj_queimadas", Kind = "Database"]}[Data],
+				  nav2 = nav1{[Name = "gold", Kind = "Schema"]}[Data],
+				  nav3 = nav2{[Name = "gold_queimadas", Kind = "Table"]}[Data],
+				  tipoAlterado = Table.TransformColumnTypes(nav3, {{"hora_pas", type time}})
+				in
+				  tipoAlterado
+
+	annotation PBI_ResultType = Table
+

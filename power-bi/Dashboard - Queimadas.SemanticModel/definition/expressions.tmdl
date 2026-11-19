@@ -1,0 +1,4 @@
+/// Primeira data da dim_calendario. Deve ser 1º de janeiro do ano da data mais antiga da fato.
+expression p_DataInicial = #date(2023, 1, 1) meta [IsParameterQuery = true, Type = "Date", IsParameterQueryRequired = true]
+	lineageTag: f22d2122-eeb9-4d98-be9b-1b12ead74883
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Dashboard - Queimadas"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4cf16f6e-f667-4aee-bbbb-99716c7ea86e"
+  }
+}

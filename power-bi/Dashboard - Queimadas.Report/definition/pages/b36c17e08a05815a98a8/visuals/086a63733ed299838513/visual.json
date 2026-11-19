@@ -1,0 +1,75 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "086a63733ed299838513",
+  "position": {
+    "x": 1056,
+    "y": 192,
+    "z": 1,
+    "height": 768,
+    "width": 768
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_calendario"
+                    }
+                  },
+                  "Property": "Dia da Semana Abrev"
+                }
+              },
+              "queryRef": "dim_calendario.Dia da Semana Abrev",
+              "nativeQueryRef": "Dia da Semana Abrev",
+              "active": true
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_hora"
+                    }
+                  },
+                  "Property": "Hora Num"
+                }
+              },
+              "queryRef": "dim_hora.Hora Num",
+              "nativeQueryRef": "Hora Num",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Total de Focos"
+                }
+              },
+              "queryRef": "_Medidas.Total de Focos",
+              "nativeQueryRef": "Total de Focos"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Dashboard - Queimadas"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "58377ac2-9f2d-4376-89da-004b6858300b"
+  }
+}

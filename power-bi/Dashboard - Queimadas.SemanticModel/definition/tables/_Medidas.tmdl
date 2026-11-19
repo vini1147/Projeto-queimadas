@@ -1,0 +1,42 @@
+/// Tabela exclusiva para medidas DAX. Não contém dados.
+table _Medidas
+	lineageTag: 240b85a9-c3ec-4e5a-bdb3-94bca4e69b08
+
+	/// Quantidade de focos de queimada no contexto de filtro atual (1 linha da fato = 1 foco).
+	measure 'Total de Focos' = COUNTROWS ( gold_queimadas )
+		formatString: #,0
+		displayFolder: Focos
+		lineageTag: 511e78c9-87bc-4623-8c63-3f22cd375489
+
+	/// Total de focos no mês imediatamente anterior ao período em contexto. Retorna em branco quando o período atual não tem focos (evita linhas fantasmas em visuais). Uso pretendido: contexto de mês.
+	measure 'Focos Mês Anterior' =
+			IF (
+			    ISBLANK ( [Total de Focos] ),
+			    BLANK (),
+			    CALCULATE ( [Total de Focos], DATEADD ( dim_calendario[Data], -1, MONTH ) )
+			)
+		formatString: #,0
+		displayFolder: Focos
+		lineageTag: aab82a4f-c5b4-45f2-894b-24237c6fa21a
+
+	/// Variação percentual de focos vs. mês anterior. Em branco quando não há mês anterior com dados. Uso pretendido: contexto de mês.
+	measure 'Variação MoM %' = DIVIDE ( [Total de Focos] - [Focos Mês Anterior], [Focos Mês Anterior] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Focos
+		lineageTag: 029a4238-7bdf-45ab-8cae-17e7e82d7ccf
+
+	column Coluna
+		dataType: string
+		isHidden
+		lineageTag: 09553d13-0737-41e8-be2e-e34206173e29
+		summarizeBy: none
+		sourceColumn: Coluna
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Fonte = #table(type table [Coluna = text], {})
+				in
+				    Fonte
+
