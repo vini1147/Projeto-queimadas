@@ -25,6 +25,115 @@ table _Medidas
 		displayFolder: Focos
 		lineageTag: 029a4238-7bdf-45ab-8cae-17e7e82d7ccf
 
+	/// Focos no mesmo período do ano anterior. Em branco quando o período atual não tem focos (evita linhas fantasmas) ou quando não há dados no ano anterior.
+	measure 'Focos Ano Anterior' =
+			IF (
+			    ISBLANK ( [Total de Focos] ),
+			    BLANK (),
+			    CALCULATE ( [Total de Focos], SAMEPERIODLASTYEAR ( dim_calendario[Data] ) )
+			)
+		formatString: #,0
+		displayFolder: Focos
+		lineageTag: 207b70f1-63c8-47c7-94f3-e00e54a5e059
+
+	/// Variação percentual de focos contra o mesmo período do ano anterior. Negativo = menos focos (melhor). Em branco sem base de comparação.
+	measure 'Variação Ano Anterior %' = DIVIDE ( [Total de Focos] - [Focos Ano Anterior], [Focos Ano Anterior] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Focos
+		lineageTag: 2d01753f-59e7-463c-81ab-6c3ae3d43673
+
+	/// Latitude média dos focos no contexto atual. Usada no mapa Deneb.
+	measure 'Latitude Média' = AVERAGE ( gold_queimadas[latitude] )
+		formatString: 0.0000
+		displayFolder: Mapa
+		lineageTag: 115eeac0-ec11-47ae-9bf6-36c2fe4d5a01
+
+	/// Longitude média dos focos no contexto atual. Usada no mapa Deneb.
+	measure 'Longitude Média' = AVERAGE ( gold_queimadas[longitude] )
+		formatString: 0.0000
+		displayFolder: Mapa
+		lineageTag: 0f985b18-2986-4646-9de5-bde917cb9c2d
+
+	/// Média de dias sem chuva dos focos no contexto atual (condição de seca). Linhas sem informação são ignoradas.
+	measure 'Dias sem Chuva Médio' = AVERAGE ( gold_queimadas[numero_dias_sem_chuva] )
+		formatString: #,0.0
+		displayFolder: Seca
+		lineageTag: dc5474c9-3ec8-4a63-869e-14f85c2deb44
+
+	/// Dias sem chuva (média) no mesmo período do ano anterior. Em branco quando o período atual não tem dado (evita linhas fantasmas).
+	measure 'Dias sem Chuva Ano Anterior' =
+			IF (
+			    ISBLANK ( [Dias sem Chuva Médio] ),
+			    BLANK (),
+			    CALCULATE ( [Dias sem Chuva Médio], SAMEPERIODLASTYEAR ( dim_calendario[Data] ) )
+			)
+		formatString: #,0.0
+		displayFolder: Seca
+		lineageTag: a9a9a333-332f-4ab0-b2b7-106f918e8e91
+
+	/// Dias sem chuva (média ponderada) em todo o período selecionado nos filtros do relatório, ignorando a quebra por mês do visual. Usada como valor principal do cartão Deneb.
+	measure 'Dias sem Chuva Período' = CALCULATE ( [Dias sem Chuva Médio], ALLSELECTED ( dim_calendario ) )
+		formatString: #,0.0
+		displayFolder: Seca
+		lineageTag: 4ad5560f-0e7f-43d0-9d48-873351806e4b
+
+	/// Focos classificados como risco de fogo Crítico no contexto atual.
+	measure 'Focos Risco Crítico' = CALCULATE ( [Total de Focos], gold_queimadas[classe_risco_fogo] = "Crítico" )
+		formatString: #,0
+		displayFolder: Risco
+		lineageTag: f44e6f6c-b911-4dc9-8549-65619ff602a9
+
+	/// Participação dos focos em risco Crítico sobre o total de focos do contexto.
+	measure '% Risco Crítico' =
+			IF (
+			    ISBLANK ( [Total de Focos] ),
+			    BLANK (),
+			    DIVIDE ( COALESCE ( [Focos Risco Crítico], 0 ), [Total de Focos] )
+			)
+		formatString: 0.0%
+		displayFolder: Risco
+		lineageTag: 44e6844f-faad-41cc-9fee-e1e34b4b7694
+
+	/// % de focos em risco Crítico no mesmo período do ano anterior. Em branco sem dado no período atual.
+	measure '% Risco Crítico Ano Anterior' =
+			IF (
+			    ISBLANK ( [% Risco Crítico] ),
+			    BLANK (),
+			    CALCULATE ( [% Risco Crítico], SAMEPERIODLASTYEAR ( dim_calendario[Data] ) )
+			)
+		formatString: 0.0%
+		displayFolder: Risco
+		lineageTag: 6ee3ad57-a79e-4cfc-96c6-b5479edb921a
+
+	/// % de focos em risco Crítico em todo o período selecionado nos filtros do relatório, ignorando a quebra por mês do visual. Valor principal do cartão Deneb.
+	measure '% Risco Crítico Período' = CALCULATE ( [% Risco Crítico], ALLSELECTED ( dim_calendario ) )
+		formatString: 0.0%
+		displayFolder: Risco
+		lineageTag: c802e254-0eb0-4380-b7a3-ffe0a12cba1e
+
+	/// Potência radiativa média (FRP, em MW) dos focos no contexto atual. Registros sem FRP são ignorados.
+	measure 'FRP Médio' = AVERAGE ( gold_queimadas[frp] )
+		formatString: #,0.0
+		displayFolder: Intensidade
+		lineageTag: 8bc7d81a-ddc2-44a3-a7c3-2270f4112c25
+
+	/// FRP médio no mesmo período do ano anterior. Em branco quando o período atual não tem dado (evita linhas fantasmas).
+	measure 'FRP Médio Ano Anterior' =
+			IF (
+			    ISBLANK ( [FRP Médio] ),
+			    BLANK (),
+			    CALCULATE ( [FRP Médio], SAMEPERIODLASTYEAR ( dim_calendario[Data] ) )
+			)
+		formatString: #,0.0
+		displayFolder: Intensidade
+		lineageTag: 89f42d64-98dd-4b8c-970d-653fad48b862
+
+	/// FRP médio (ponderado) em todo o período selecionado nos filtros do relatório, ignorando a quebra por mês do visual. Valor principal do cartão Deneb.
+	measure 'FRP Médio Período' = CALCULATE ( [FRP Médio], ALLSELECTED ( dim_calendario ) )
+		formatString: #,0.0
+		displayFolder: Intensidade
+		lineageTag: da29deb6-2aa9-4d85-bf51-ae624b767322
+
 	column Coluna
 		dataType: string
 		isHidden

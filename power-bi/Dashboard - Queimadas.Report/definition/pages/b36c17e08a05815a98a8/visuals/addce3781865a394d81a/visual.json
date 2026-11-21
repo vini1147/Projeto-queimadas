@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "addce3781865a394d81a",
   "position": {
-    "x": 240,
-    "y": 480,
+    "x": 1200,
+    "y": 320,
     "z": 2,
-    "height": 432,
+    "height": 480,
     "width": 576,
     "tabOrder": 1
   },
@@ -162,7 +162,7 @@
             "viewportHeight": {
               "expr": {
                 "Literal": {
-                  "Value": "422D"
+                  "Value": "470D"
                 }
               }
             },
