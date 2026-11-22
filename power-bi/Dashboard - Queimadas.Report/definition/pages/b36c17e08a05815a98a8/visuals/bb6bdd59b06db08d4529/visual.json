@@ -1,0 +1,248 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "bb6bdd59b06db08d4529",
+  "position": {
+    "x": 1168,
+    "y": 592,
+    "z": 7000,
+    "height": 457,
+    "width": 720,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_insights"
+                    }
+                  },
+                  "Property": "Id"
+                }
+              },
+              "queryRef": "dim_insights.Id",
+              "nativeQueryRef": "Id"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Insight"
+                }
+              },
+              "queryRef": "_Medidas.Insight",
+              "nativeQueryRef": "Insight"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Insight Contexto"
+                }
+              },
+              "queryRef": "_Medidas.Insight Contexto",
+              "nativeQueryRef": "Insight Contexto"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vega'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n \"$schema\": \"https://vega.github.io/schema/vega/v5.json\",\n \"description\": \"Insights em texto gerados por medidas DAX (formato TAG|DESTAQUE|TEXTO|TOM). Cada insight tem uma etiqueta, um destaque numerico e um paragrafo com quebra de linha automatica; a cor da barra lateral indica o tom (alerta, positivo, neutro).\",\n \"padding\": 0,\n \"config\": {\n  \"view\": {\n   \"stroke\": null\n  },\n  \"text\": {\n   \"font\": \"Din\"\n  }\n },\n \"data\": [\n  {\n   \"name\": \"dataset\"\n  },\n  {\n   \"name\": \"ins\",\n   \"source\": \"dataset\",\n   \"transform\": [\n    {\n     \"type\": \"formula\",\n     \"as\": \"id\",\n     \"expr\": \"datum[''Id'']\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"parts\",\n     \"expr\": \"split(isValid(datum[''Insight'']) ? datum[''Insight''] : '''', ''|'')\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"tag\",\n     \"expr\": \"datum.parts[0]\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"big\",\n     \"expr\": \"datum.parts[1]\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"texto\",\n     \"expr\": \"datum.parts[2]\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"tom\",\n     \"expr\": \"datum.parts[3]\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"ctx\",\n     \"expr\": \"datum[''Insight Contexto'']\"\n    },\n    {\n     \"type\": \"filter\",\n     \"expr\": \"isValid(datum.id) && length(datum.parts) >= 4 && length(datum.texto) > 0\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"toneColor\",\n     \"expr\": \"datum.tom === ''alerta'' ? cAlert : (datum.tom === ''positivo'' ? cPositive : cAccent)\"\n    },\n    {\n     \"type\": \"collect\",\n     \"sort\": {\n      \"field\": \"id\",\n      \"order\": \"ascending\"\n     }\n    }\n   ]\n  },\n  {\n   \"name\": \"words\",\n   \"source\": \"ins\",\n   \"transform\": [\n    {\n     \"type\": \"formula\",\n     \"as\": \"ws\",\n     \"expr\": \"split(datum.texto, '' '')\"\n    },\n    {\n     \"type\": \"flatten\",\n     \"fields\": [\n      \"ws\"\n     ],\n     \"as\": [\n      \"w\"\n     ],\n     \"index\": \"wi\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"wl\",\n     \"expr\": \"length(datum.w) + 1\"\n    },\n    {\n     \"type\": \"window\",\n     \"groupby\": [\n      \"id\"\n     ],\n     \"sort\": {\n      \"field\": \"wi\"\n     },\n     \"ops\": [\n      \"sum\"\n     ],\n     \"fields\": [\n      \"wl\"\n     ],\n     \"as\": [\n      \"cum\"\n     ],\n     \"frame\": [\n      null,\n      0\n     ]\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"line\",\n     \"expr\": \"floor((datum.cum - 1) / maxChars)\"\n    }\n   ]\n  },\n  {\n   \"name\": \"linesBase\",\n   \"source\": \"words\",\n   \"transform\": [\n    {\n     \"type\": \"aggregate\",\n     \"groupby\": [\n      \"id\",\n      \"line\"\n     ],\n     \"ops\": [\n      \"values\",\n      \"min\"\n     ],\n     \"fields\": [\n      \"w\",\n      \"wi\"\n     ],\n     \"as\": [\n      \"items\",\n      \"wmin\"\n     ]\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"lineText\",\n     \"expr\": \"join(pluck(datum.items, ''w''), '' '')\"\n    },\n    {\n     \"type\": \"collect\",\n     \"sort\": {\n      \"field\": [\n       \"id\",\n       \"line\"\n      ],\n      \"order\": [\n       \"ascending\",\n       \"ascending\"\n      ]\n     }\n    }\n   ]\n  },\n  {\n   \"name\": \"rowsInfo\",\n   \"source\": \"linesBase\",\n   \"transform\": [\n    {\n     \"type\": \"aggregate\",\n     \"groupby\": [\n      \"id\"\n     ],\n     \"ops\": [\n      \"count\"\n     ],\n     \"fields\": [\n      null\n     ],\n     \"as\": [\n      \"nLines\"\n     ]\n    },\n    {\n     \"type\": \"lookup\",\n     \"from\": \"ins\",\n     \"key\": \"id\",\n     \"fields\": [\n      \"id\"\n     ],\n     \"values\": [\n      \"tag\",\n      \"big\",\n      \"tom\",\n      \"toneColor\",\n      \"ctx\"\n     ],\n     \"as\": [\n      \"tag\",\n      \"big\",\n      \"tom\",\n      \"toneColor\",\n      \"ctx\"\n     ]\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"rowH\",\n     \"expr\": \"max(leftH, datum.nLines * lh) + 2 * rowPad\"\n    },\n    {\n     \"type\": \"collect\",\n     \"sort\": {\n      \"field\": \"id\",\n      \"order\": \"ascending\"\n     }\n    },\n    {\n     \"type\": \"window\",\n     \"ops\": [\n      \"sum\"\n     ],\n     \"fields\": [\n      \"rowH\"\n     ],\n     \"as\": [\n      \"cumH\"\n     ],\n     \"frame\": [\n      null,\n      0\n     ]\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"rowTop\",\n     \"expr\": \"topY + datum.cumH - datum.rowH\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"fits\",\n     \"expr\": \"datum.rowTop + datum.rowH <= height - pad - footerH\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"first\",\n     \"expr\": \"datum.rowTop === topY\"\n    }\n   ]\n  },\n  {\n   \"name\": \"lines\",\n   \"source\": \"linesBase\",\n   \"transform\": [\n    {\n     \"type\": \"lookup\",\n     \"from\": \"rowsInfo\",\n     \"key\": \"id\",\n     \"fields\": [\n      \"id\"\n     ],\n     \"values\": [\n      \"rowTop\",\n      \"fits\"\n     ],\n     \"as\": [\n      \"rowTop\",\n      \"fits\"\n     ]\n    }\n   ]\n  },\n  {\n   \"name\": \"hidden\",\n   \"source\": \"rowsInfo\",\n   \"transform\": [\n    {\n     \"type\": \"filter\",\n     \"expr\": \"!datum.fits\"\n    },\n    {\n     \"type\": \"aggregate\",\n     \"ops\": [\n      \"count\"\n     ],\n     \"fields\": [\n      null\n     ],\n     \"as\": [\n      \"n\"\n     ]\n    }\n   ]\n  },\n  {\n   \"name\": \"ctxRow\",\n   \"source\": \"ins\",\n   \"transform\": [\n    {\n     \"type\": \"aggregate\",\n     \"ops\": [\n      \"max\"\n     ],\n     \"fields\": [\n      \"ctx\"\n     ],\n     \"as\": [\n      \"ctx\"\n     ]\n    }\n   ]\n  },\n  {\n   \"name\": \"emptyState\",\n   \"values\": [\n    {\n     \"k\": 1\n    }\n   ],\n   \"transform\": [\n    {\n     \"type\": \"filter\",\n     \"expr\": \"length(data(''ins'')) === 0\"\n    }\n   ]\n  }\n ],\n \"signals\": [\n  {\n   \"name\": \"cText\",\n   \"value\": \"#F4F6F8\"\n  },\n  {\n   \"name\": \"cTextMuted\",\n   \"value\": \"#AEB6C2\"\n  },\n  {\n   \"name\": \"cSurface\",\n   \"value\": \"#15191F\"\n  },\n  {\n   \"name\": \"cSurface2\",\n   \"value\": \"#1D232B\"\n  },\n  {\n   \"name\": \"cBorder\",\n   \"value\": \"#2A323C\"\n  },\n  {\n   \"name\": \"cAccent\",\n   \"value\": \"#5BC0EB\"\n  },\n  {\n   \"name\": \"cPositive\",\n   \"value\": \"#3DDC97\"\n  },\n  {\n   \"name\": \"cAlert\",\n   \"value\": \"#F5B544\"\n  },\n  {\n   \"name\": \"fs\",\n   \"update\": \"max(0.8, min(1.2, min(width / 760, height / 420)))\"\n  },\n  {\n   \"name\": \"pad\",\n   \"update\": \"max(12, min(22, width * 0.03))\"\n  },\n  {\n   \"name\": \"gap\",\n   \"update\": \"max(10, 14 * fs)\"\n  },\n  {\n   \"name\": \"radius\",\n   \"update\": \"max(10, min(18, height * 0.05))\"\n  },\n  {\n   \"name\": \"fsTitle\",\n   \"update\": \"max(10.5, 11 * fs)\"\n  },\n  {\n   \"name\": \"fsTag\",\n   \"update\": \"max(9.5, 10 * fs)\"\n  },\n  {\n   \"name\": \"fsBody\",\n   \"update\": \"max(11, 12.5 * fs)\"\n  },\n  {\n   \"name\": \"lh\",\n   \"update\": \"fsBody * 1.4\"\n  },\n  {\n   \"name\": \"bigMax\",\n   \"update\": \"max(18, 24 * fs)\"\n  },\n  {\n   \"name\": \"rowPad\",\n   \"update\": \"max(8, 10 * fs)\"\n  },\n  {\n   \"name\": \"barW\",\n   \"update\": \"4\"\n  },\n  {\n   \"name\": \"innerW\",\n   \"update\": \"max(0, width - 2 * pad)\"\n  },\n  {\n   \"name\": \"colW\",\n   \"update\": \"max(100, min(170, innerW * 0.22))\"\n  },\n  {\n   \"name\": \"textX\",\n   \"update\": \"pad + barW + gap + colW + gap\"\n  },\n  {\n   \"name\": \"textW\",\n   \"update\": \"max(60, width - pad - textX)\"\n  },\n  {\n   \"name\": \"maxChars\",\n   \"update\": \"max(12, floor(textW / (fsBody * 0.58) * 0.92))\"\n  },\n  {\n   \"name\": \"leftH\",\n   \"update\": \"fsTag + 6 + bigMax + 2\"\n  },\n  {\n   \"name\": \"stackedHeader\",\n   \"update\": \"width < 640\"\n  },\n  {\n   \"name\": \"headerH\",\n   \"update\": \"fsTitle + 16 + (stackedHeader ? fsTag + 6 : 0)\"\n  },\n  {\n   \"name\": \"topY\",\n   \"update\": \"pad + headerH\"\n  },\n  {\n   \"name\": \"footerH\",\n   \"update\": \"fsTag + 12\"\n  }\n ],\n \"marks\": [\n  {\n   \"name\": \"shadow\",\n   \"type\": \"rect\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"value\": 3\n     },\n     \"y\": {\n      \"value\": 3\n     },\n     \"width\": {\n      \"signal\": \"max(0, width - 3)\"\n     },\n     \"height\": {\n      \"signal\": \"max(0, height - 3)\"\n     },\n     \"cornerRadius\": {\n      \"signal\": \"radius\"\n     },\n     \"fill\": {\n      \"value\": \"#000000\"\n     },\n     \"fillOpacity\": {\n      \"value\": 0.28\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"surface\",\n   \"type\": \"rect\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"value\": 0\n     },\n     \"y\": {\n      \"value\": 0\n     },\n     \"width\": {\n      \"signal\": \"max(0, width - 3)\"\n     },\n     \"height\": {\n      \"signal\": \"max(0, height - 3)\"\n     },\n     \"cornerRadius\": {\n      \"signal\": \"radius\"\n     },\n     \"fill\": {\n      \"signal\": \"cSurface\"\n     },\n     \"stroke\": {\n      \"signal\": \"cBorder\"\n     },\n     \"strokeWidth\": {\n      \"value\": 1\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"title\",\n   \"type\": \"text\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"y\": {\n      \"signal\": \"pad\"\n     },\n     \"text\": {\n      \"value\": \"INSIGHTS DO PERÍODO\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsTitle\"\n     },\n     \"fontWeight\": {\n      \"value\": 600\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"context\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"ctxRow\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"stackedHeader ? pad : width - pad\"\n     },\n     \"y\": {\n      \"signal\": \"stackedHeader ? pad + fsTitle + 6 : pad\"\n     },\n     \"text\": {\n      \"field\": \"ctx\"\n     },\n     \"align\": {\n      \"signal\": \"stackedHeader ? ''left'' : ''right''\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsTag + 0.5\"\n     },\n     \"limit\": {\n      \"signal\": \"stackedHeader ? innerW : max(0, innerW - 170)\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"dividers\",\n   \"type\": \"rule\",\n   \"from\": {\n    \"data\": \"rowsInfo\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"x2\": {\n      \"signal\": \"width - pad\"\n     },\n     \"y\": {\n      \"signal\": \"datum.rowTop\"\n     },\n     \"stroke\": {\n      \"signal\": \"cBorder\"\n     },\n     \"strokeOpacity\": {\n      \"signal\": \"datum.first || !datum.fits ? 0 : 0.9\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"toneBars\",\n   \"type\": \"rect\",\n   \"from\": {\n    \"data\": \"rowsInfo\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"width\": {\n      \"signal\": \"barW\"\n     },\n     \"y\": {\n      \"signal\": \"datum.rowTop + rowPad\"\n     },\n     \"height\": {\n      \"signal\": \"max(4, datum.rowH - 2 * rowPad)\"\n     },\n     \"cornerRadius\": {\n      \"value\": 2\n     },\n     \"fill\": {\n      \"field\": \"toneColor\"\n     },\n     \"fillOpacity\": {\n      \"signal\": \"datum.fits ? 1 : 0\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"tags\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"rowsInfo\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad + barW + gap\"\n     },\n     \"y\": {\n      \"signal\": \"datum.rowTop + rowPad\"\n     },\n     \"text\": {\n      \"signal\": \"datum.fits ? datum.tag : ''''\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"field\": \"toneColor\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsTag\"\n     },\n     \"fontWeight\": {\n      \"value\": 700\n     },\n     \"limit\": {\n      \"signal\": \"colW + gap - 2\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"bigs\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"rowsInfo\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad + barW + gap\"\n     },\n     \"y\": {\n      \"signal\": \"datum.rowTop + rowPad + fsTag + 6\"\n     },\n     \"text\": {\n      \"signal\": \"datum.fits ? datum.big : ''''\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cText\"\n     },\n     \"fontSize\": {\n      \"signal\": \"max(14, min(bigMax, colW / (max(1, length(datum.big)) * 0.62)))\"\n     },\n     \"fontWeight\": {\n      \"value\": 700\n     },\n     \"limit\": {\n      \"signal\": \"colW\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"bodyText\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"lines\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"textX\"\n     },\n     \"y\": {\n      \"signal\": \"datum.rowTop + rowPad + datum.line * lh\"\n     },\n     \"text\": {\n      \"signal\": \"datum.fits ? datum.lineText : ''''\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cText\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsBody\"\n     },\n     \"limit\": {\n      \"signal\": \"textW\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"hiddenNote\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"hidden\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"y\": {\n      \"signal\": \"height - pad - 2\"\n     },\n     \"text\": {\n      \"signal\": \"''+ '' + datum.n + (datum.n === 1 ? '' insight não cabe'' : '' insights não cabem'') + '' — aumente a altura do visual''\"\n     },\n     \"baseline\": {\n      \"value\": \"bottom\"\n     },\n     \"fill\": {\n      \"signal\": \"cAlert\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsTag\"\n     },\n     \"fontWeight\": {\n      \"value\": 600\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"footerNote\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"ctxRow\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"width - pad\"\n     },\n     \"y\": {\n      \"signal\": \"height - pad - 2\"\n     },\n     \"text\": {\n      \"signal\": \"length(data(''hidden'')) > 0 ? '''' : ''Textos gerados a partir dos filtros do relatório''\"\n     },\n     \"align\": {\n      \"value\": \"right\"\n     },\n     \"baseline\": {\n      \"value\": \"bottom\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsTag\"\n     },\n     \"opacity\": {\n      \"value\": 0.8\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"emptyMessage\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"emptyState\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"width / 2\"\n     },\n     \"y\": {\n      \"signal\": \"height / 2\"\n     },\n     \"text\": {\n      \"value\": \"Sem dados para o contexto selecionado\"\n     },\n     \"align\": {\n      \"value\": \"center\"\n     },\n     \"baseline\": {\n      \"value\": \"middle\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"max(12, 14 * fs)\"\n     },\n     \"limit\": {\n      \"signal\": \"max(0, width - 2 * pad)\"\n     }\n    }\n   }\n  }\n ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"autosize\": {\n    \"contains\": \"padding\",\n    \"type\": \"fit\"\n  },\n  \"view\": {\n    \"stroke\": \"transparent\"\n  },\n  \"font\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n  \"arc\": {},\n  \"area\": {\n    \"line\": true,\n    \"opacity\": 0.6\n  },\n  \"bar\": {},\n  \"line\": {\n    \"strokeWidth\": 3,\n    \"strokeCap\": \"round\",\n    \"strokeJoin\": \"round\"\n  },\n  \"point\": {\n    \"filled\": true,\n    \"size\": 75\n  },\n  \"rect\": {},\n  \"text\": {\n    \"font\": \"Din, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"fontSize\": 12,\n    \"fill\": \"#616161\"\n  },\n  \"axis\": {\n    \"ticks\": false,\n    \"grid\": false,\n    \"domain\": false,\n    \"labelColor\": \"#616161\",\n    \"labelFontSize\": 12,\n    \"titleFont\": \"din, wf_standard-font, helvetica, arial, sans-serif\",\n    \"titleColor\": \"#242424\",\n    \"titleFontSize\": 16,\n    \"titleFontWeight\": \"normal\"\n  },\n  \"axisQuantitative\": {\n    \"tickCount\": 3,\n    \"grid\": true,\n    \"gridColor\": \"#C7C7C7\",\n    \"gridDash\": [\n      1,\n      5\n    ],\n    \"labelFlush\": false\n  },\n  \"axisX\": {\n    \"labelPadding\": 5\n  },\n  \"axisY\": {\n    \"labelPadding\": 10\n  },\n  \"header\": {\n    \"titleFont\": \"din, wf_standard-font, helvetica, arial, sans-serif\",\n    \"titleFontSize\": 16,\n    \"titleColor\": \"#242424\",\n    \"labelFont\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"labelFontSize\": 13.333333333333332,\n    \"labelColor\": \"#616161\"\n  },\n  \"legend\": {\n    \"titleFont\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"titleFontWeight\": \"bold\",\n    \"titleColor\": \"#616161\",\n    \"labelFont\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"labelFontSize\": 13.333333333333332,\n    \"labelColor\": \"#616161\",\n    \"symbolType\": \"circle\",\n    \"symbolSize\": 75\n  },\n  \"path\": {},\n  \"shape\": {},\n  \"symbol\": {\n    \"strokeWidth\": 1.5,\n    \"size\": 50\n  }\n}'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenuSelector": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            },
+            "selectionMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'simple'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "447D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "710D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataLimit": [
+        {
+          "properties": {
+            "override": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "editor": [
+        {
+          "properties": {
+            "theme": {
+              "expr": {
+                "Literal": {
+                  "Value": "'light'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

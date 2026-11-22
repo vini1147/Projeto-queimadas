@@ -68,6 +68,11 @@
       "type": "RegisteredResources",
       "items": [
         {
+          "name": "background-bi8196420522948481.png",
+          "path": "background-bi8196420522948481.png",
+          "type": "Image"
+        },
+        {
           "name": "Custom9571214518505115.json",
           "path": "Custom9571214518505115.json",
           "type": "CustomTheme"

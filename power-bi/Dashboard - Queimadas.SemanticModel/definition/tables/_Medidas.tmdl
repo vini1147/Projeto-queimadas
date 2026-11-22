@@ -149,6 +149,210 @@ table _Medidas
 		displayFolder: Intensidade
 		lineageTag: da29deb6-2aa9-4d85-bf51-ae624b767322
 
+	/// Ano mais recente com focos dentro dos filtros do relatório. Base de comparação (contra o ano anterior) dos insights.
+	measure 'Ano Referência' =
+			VAR _anos = ALLSELECTED ( dim_calendario[Ano] )
+			RETURN
+			    MAXX ( FILTER ( _anos, CALCULATE ( [Total de Focos] ) > 0 ), dim_calendario[Ano] )
+		formatString: 0
+		displayFolder: Insights
+		lineageTag: 5f899e7c-0e90-4415-9779-554c5c3c1706
+
+	/// Texto de contexto do visual de insights: qual ano é a referência e contra qual ano ele é comparado.
+	measure 'Insight Contexto' =
+			VAR _Y = [Ano Referência]
+			VAR _tem = CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y - 1 ) > 0
+			RETURN
+			    IF (
+			        ISBLANK ( _Y ),
+			        "Sem dados no período selecionado",
+			        IF (
+			            _tem,
+			            "Ano de referência " & _Y & " · comparado a " & ( _Y - 1 ),
+			            "Ano de referência " & _Y & " · sem ano anterior para comparar"
+			        )
+			    )
+		displayFolder: Insights
+		lineageTag: f746fe55-1ea7-40ac-b750-65924bd8fd8b
+
+	/// Insight 1 - sazonalidade: os 3 meses mais críticos e a fatia dos focos que concentram. Formato TAG|DESTAQUE|TEXTO|TOM.
+	measure 'Insight 1' =
+			VAR _meses = ADDCOLUMNS ( VALUES ( dim_calendario[Mês Num] ), "F", [Total de Focos] )
+			VAR _com = FILTER ( _meses, [F] > 0 )
+			VAR _n = COUNTROWS ( _com )
+			VAR _tot = SUMX ( _com, [F] )
+			VAR _top = TOPN ( 3, _com, [F], DESC )
+			VAR _share = DIVIDE ( SUMX ( _top, [F] ), _tot )
+			VAR _nomes =
+			    CONCATENATEX (
+			        _top,
+			        LOOKUPVALUE ( dim_calendario[Mês Abrev], dim_calendario[Mês Num], dim_calendario[Mês Num] ),
+			        ", ",
+			        dim_calendario[Mês Num], ASC
+			    )
+			VAR _pico = TOPN ( 1, _com, [F], DESC )
+			VAR _picoMes = MAXX ( _pico, dim_calendario[Mês Num] )
+			VAR _picoNome = LOOKUPVALUE ( dim_calendario[Mês], dim_calendario[Mês Num], _picoMes )
+			VAR _picoShare = DIVIDE ( MAXX ( _pico, [F] ), _tot )
+			VAR _texto =
+			    _nomes & " concentram " & FORMAT ( _share, "0.0%", "pt-BR" ) & " dos focos. O pico é "
+			        & _picoNome & ", com " & FORMAT ( _picoShare, "0.0%", "pt-BR" ) & " do total."
+			RETURN
+			    IF (
+			        _n < 6,
+			        "SAZONALIDADE|—|Selecione um período com 6 meses ou mais para ver a concentração sazonal.|neutro",
+			        "SAZONALIDADE|" & FORMAT ( _share, "0%", "pt-BR" ) & "|" & _texto & "|" & IF ( _share >= 0.5, "alerta", "neutro" )
+			    )
+		displayFolder: Insights
+		lineageTag: a8307c13-e589-4994-8dc8-33fb0109fdeb
+
+	/// Insight 2 - bioma líder no ano de referência e se a liderança mudou contra o ano anterior. Formato TAG|DESTAQUE|TEXTO|TOM.
+	measure 'Insight 2' =
+			VAR _Y = [Ano Referência]
+			VAR _now = ADDCOLUMNS ( VALUES ( gold_queimadas[bioma] ), "F", CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y ) )
+			VAR _prev = ADDCOLUMNS ( VALUES ( gold_queimadas[bioma] ), "F", CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y - 1 ) )
+			VAR _tNow = SUMX ( _now, [F] )
+			VAR _tPrev = SUMX ( _prev, [F] )
+			VAR _topNow = TOPN ( 1, _now, [F], DESC )
+			VAR _topPrev = TOPN ( 1, _prev, [F], DESC )
+			VAR _lNow = MAXX ( _topNow, gold_queimadas[bioma] )
+			VAR _lPrev = MAXX ( _topPrev, gold_queimadas[bioma] )
+			VAR _sNow = DIVIDE ( MAXX ( _topNow, [F] ), _tNow )
+			VAR _sPrev = DIVIDE ( MAXX ( _topPrev, [F] ), _tPrev )
+			VAR _sLNowPrev = DIVIDE ( MAXX ( FILTER ( _prev, gold_queimadas[bioma] = _lNow ), [F] ), _tPrev )
+			VAR _sLPrevNow = DIVIDE ( MAXX ( FILTER ( _now, gold_queimadas[bioma] = _lPrev ), [F] ), _tNow )
+			VAR _f = "0.0%"
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _lNow ), "BIOMA LÍDER|—|Sem dados para o período selecionado.|neutro",
+			        _tPrev > 0 && _lNow <> _lPrev,
+			            "BIOMA LÍDER|" & _lNow & "|" & _lNow & " assumiu a liderança em " & _Y & ", com "
+			                & FORMAT ( _sNow, _f, "pt-BR" ) & " dos focos (eram " & FORMAT ( _sLNowPrev, _f, "pt-BR" )
+			                & " em " & ( _Y - 1 ) & "). " & _lPrev & ", que liderava, passou de "
+			                & FORMAT ( _sPrev, _f, "pt-BR" ) & " para " & FORMAT ( _sLPrevNow, _f, "pt-BR" ) & ".|alerta",
+			        _tPrev > 0,
+			            "BIOMA LÍDER|" & _lNow & "|" & _lNow & " segue como bioma líder em " & _Y & ": "
+			                & FORMAT ( _sNow, _f, "pt-BR" ) & " dos focos (" & FORMAT ( _sPrev, _f, "pt-BR" )
+			                & " em " & ( _Y - 1 ) & ").|neutro",
+			        "BIOMA LÍDER|" & _lNow & "|" & _lNow & " lidera em " & _Y & ", com "
+			            & FORMAT ( _sNow, _f, "pt-BR" ) & " dos focos.|neutro"
+			    )
+		displayFolder: Insights
+		lineageTag: 28e85968-a3f4-4169-94d9-19c593e0a38d
+
+	/// Insight 3 - quantos estados tiveram mais focos que no ano anterior e qual teve a maior alta. Formato TAG|DESTAQUE|TEXTO|TOM.
+	measure 'Insight 3' =
+			VAR _Y = [Ano Referência]
+			VAR _e =
+			    ADDCOLUMNS (
+			        VALUES ( gold_queimadas[estado] ),
+			        "Now", CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y ),
+			        "Prev", CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y - 1 )
+			    )
+			VAR _base = FILTER ( _e, [Prev] > 0 )
+			VAR _n = COUNTROWS ( _base )
+			VAR _cres = FILTER ( _base, [Now] > [Prev] )
+			VAR _nc = COUNTROWS ( _cres )
+			VAR _tNow = SUMX ( _e, [Now] )
+			VAR _tPrev = SUMX ( _e, [Prev] )
+			VAR _chg = DIVIDE ( _tNow - _tPrev, _tPrev )
+			VAR _top = TOPN ( 1, ADDCOLUMNS ( _cres, "Dif", [Now] - [Prev] ), [Dif], DESC )
+			VAR _nome = MAXX ( _top, gold_queimadas[estado] )
+			VAR _dif = MAXX ( _top, [Dif] )
+			VAR _pct = DIVIDE ( _dif, MAXX ( _top, [Prev] ) )
+			VAR _p = "+0.0%;-0.0%;0.0%"
+			VAR _tom = IF ( _chg < 0 || DIVIDE ( _nc, _n ) >= 0.5, "alerta", "neutro" )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        _n = 0, "ESTADOS EM ALTA|—|Sem ano anterior para comparar os estados.|neutro",
+			        _nc = 0,
+			            "ESTADOS EM ALTA|0 de " & _n & "|Nenhum dos " & _n & " estados teve mais focos em " & _Y
+			                & " que em " & ( _Y - 1 ) & ". Variação do total: " & FORMAT ( _chg, _p, "pt-BR" ) & ".|positivo",
+			        "ESTADOS EM ALTA|" & _nc & " de " & _n & "|" & _nc & " de " & _n & " estados tiveram mais focos em " & _Y
+			            & " que em " & ( _Y - 1 ) & ". Maior alta: " & _nome & " (" & FORMAT ( _pct, _p, "pt-BR" ) & ", "
+			            & FORMAT ( _dif / 1000, "+#,0.0", "pt-BR" ) & " mil focos). Variação do total: "
+			            & FORMAT ( _chg, _p, "pt-BR" ) & ".|" & _tom
+			    )
+		displayFolder: Insights
+		lineageTag: 81003e62-a821-4e42-863e-d9563d558259
+
+	/// Insight 4 - volume de focos, % em risco crítico e dias sem chuva contra o ano anterior. Formato TAG|DESTAQUE|TEXTO|TOM.
+	measure 'Insight 4' =
+			VAR _Y = [Ano Referência]
+			VAR _fN = CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y )
+			VAR _fP = CALCULATE ( [Total de Focos], dim_calendario[Ano] = _Y - 1 )
+			VAR _dN = CALCULATE ( [Dias sem Chuva Médio], dim_calendario[Ano] = _Y )
+			VAR _dP = CALCULATE ( [Dias sem Chuva Médio], dim_calendario[Ano] = _Y - 1 )
+			VAR _cN = CALCULATE ( [% Risco Crítico], dim_calendario[Ano] = _Y )
+			VAR _cP = CALCULATE ( [% Risco Crítico], dim_calendario[Ano] = _Y - 1 )
+			VAR _chgF = DIVIDE ( _fN - _fP, _fP )
+			VAR _chgD = DIVIDE ( _dN - _dP, _dP )
+			VAR _pp = ( _cN - _cP ) * 100
+			VAR _p = "+0.0%;-0.0%;0.0%"
+			VAR _c = FORMAT ( _cN, "0.0%", "pt-BR" )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _fN ), "RISCO E CLIMA|—|Sem dados para o período selecionado.|neutro",
+			        _fP > 0,
+			            "RISCO E CLIMA|" & FORMAT ( _cN, "0%", "pt-BR" ) & "|Focos " & FORMAT ( _chgF, _p, "pt-BR" )
+			                & " vs " & ( _Y - 1 ) & ". " & IF ( _chgF < 0 && _cN >= 0.5, "Mesmo assim, ", "" ) & _c
+			                & " dos focos estão em risco crítico (" & FORMAT ( _pp, "+0.0;-0.0;0.0", "pt-BR" )
+			                & " p.p.). Dias sem chuva médios: " & FORMAT ( _dN, "0.0", "pt-BR" ) & " ("
+			                & FORMAT ( _chgD, _p, "pt-BR" ) & ").|" & IF ( _cN >= 0.5, "alerta", "neutro" ),
+			        "RISCO E CLIMA|" & FORMAT ( _cN, "0%", "pt-BR" ) & "|Em " & _Y & ", " & _c
+			            & " dos focos estão em risco crítico. Dias sem chuva médios: " & FORMAT ( _dN, "0.0", "pt-BR" )
+			            & ".|" & IF ( _cN >= 0.5, "alerta", "neutro" )
+			    )
+		displayFolder: Insights
+		lineageTag: 592459eb-92de-4048-9dae-cdca41c30555
+
+	/// Insight 5 - concentração: quanto dos focos os maiores municípios respondem. Formato TAG|DESTAQUE|TEXTO|TOM.
+	measure 'Insight 5' =
+			VAR _m =
+			    FILTER (
+			        ADDCOLUMNS ( SUMMARIZE ( gold_queimadas, gold_queimadas[estado], gold_queimadas[municipio] ), "F", [Total de Focos] ),
+			        [F] > 0
+			    )
+			VAR _n = COUNTROWS ( _m )
+			VAR _tot = SUMX ( _m, [F] )
+			VAR _k = IF ( _n >= 300, 100, MAX ( 3, ROUND ( _n * 0.1, 0 ) ) )
+			VAR _sK = DIVIDE ( SUMX ( TOPN ( _k, _m, [F], DESC ), [F] ), _tot )
+			VAR _s10 = DIVIDE ( SUMX ( TOPN ( MIN ( 10, _n ), _m, [F], DESC ), [F] ), _tot )
+			VAR _pm = DIVIDE ( _k, _n )
+			VAR _fecho =
+			    SWITCH (
+			        TRUE (),
+			        _s10 < 0.25, ": o problema é espalhado, não pontual.",
+			        _s10 >= 0.6, ": o problema é concentrado.",
+			        "."
+			    )
+			RETURN
+			    IF (
+			        _n = 0,
+			        "CONCENTRAÇÃO|—|Sem dados para o período selecionado.|neutro",
+			        "CONCENTRAÇÃO|" & FORMAT ( _sK, "0%", "pt-BR" ) & "|" & _k & " municípios (" & FORMAT ( _pm, "0.0%", "pt-BR" )
+			            & " dos " & FORMAT ( _n, "#,0", "pt-BR" ) & " com focos) concentram " & FORMAT ( _sK, "0.0%", "pt-BR" )
+			            & " dos focos. O Top 10 soma " & FORMAT ( _s10, "0.0%", "pt-BR" ) & _fecho & "|neutro"
+			    )
+		displayFolder: Insights
+		lineageTag: 1efca8dc-0342-49ad-a11b-4a1c8a7c5dcf
+
+	/// Despachante do visual de insights: devolve o texto do insight correspondente ao Id da linha (dim_insights[Id]).
+	measure Insight =
+			SWITCH (
+			    SELECTEDVALUE ( dim_insights[Id] ),
+			    1, [Insight 1],
+			    2, [Insight 2],
+			    3, [Insight 3],
+			    4, [Insight 4],
+			    5, [Insight 5]
+			)
+		displayFolder: Insights
+		lineageTag: 0bad8266-f47c-4eb4-8862-888387242404
+
 	column Coluna
 		dataType: string
 		isHidden

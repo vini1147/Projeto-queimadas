@@ -4,9 +4,10 @@
   "position": {
     "x": 1536,
     "y": 0,
-    "z": 4,
+    "z": 3000,
     "height": 80,
-    "width": 304
+    "width": 304,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "slicer",
@@ -106,6 +107,25 @@
                     }
                   }
                 ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
               }
             }
           }
