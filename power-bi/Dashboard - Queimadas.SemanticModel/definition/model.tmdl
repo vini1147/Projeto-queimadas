@@ -11,12 +11,13 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
 
-annotation PBI_QueryOrder = ["gold_queimadas","dim_hora"]
+annotation PBI_QueryOrder = ["gold_queimadas","dim_hora","dim_calendario","_Medidas","dim_insights","p_DataInicial"]
 
 ref table gold_queimadas
 ref table dim_hora
 ref table dim_calendario
 ref table _Medidas
+ref table dim_insights
 
 ref cultureInfo pt-BR
 

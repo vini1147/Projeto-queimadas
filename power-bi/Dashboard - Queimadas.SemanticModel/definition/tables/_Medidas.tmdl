@@ -72,7 +72,12 @@ table _Medidas
 		lineageTag: a9a9a333-332f-4ab0-b2b7-106f918e8e91
 
 	/// Dias sem chuva (média ponderada) em todo o período selecionado nos filtros do relatório, ignorando a quebra por mês do visual. Usada como valor principal do cartão Deneb.
-	measure 'Dias sem Chuva Período' = CALCULATE ( [Dias sem Chuva Médio], ALLSELECTED ( dim_calendario ) )
+	measure 'Dias sem Chuva Período' =
+			IF (
+			    ISBLANK ( [Total de Focos] ),
+			    BLANK (),
+			    CALCULATE ( [Dias sem Chuva Médio], ALLSELECTED ( dim_calendario ) )
+			)
 		formatString: #,0.0
 		displayFolder: Seca
 		lineageTag: 4ad5560f-0e7f-43d0-9d48-873351806e4b
@@ -106,7 +111,12 @@ table _Medidas
 		lineageTag: 6ee3ad57-a79e-4cfc-96c6-b5479edb921a
 
 	/// % de focos em risco Crítico em todo o período selecionado nos filtros do relatório, ignorando a quebra por mês do visual. Valor principal do cartão Deneb.
-	measure '% Risco Crítico Período' = CALCULATE ( [% Risco Crítico], ALLSELECTED ( dim_calendario ) )
+	measure '% Risco Crítico Período' =
+			IF (
+			    ISBLANK ( [Total de Focos] ),
+			    BLANK (),
+			    CALCULATE ( [% Risco Crítico], ALLSELECTED ( dim_calendario ) )
+			)
 		formatString: 0.0%
 		displayFolder: Risco
 		lineageTag: c802e254-0eb0-4380-b7a3-ffe0a12cba1e
@@ -129,7 +139,12 @@ table _Medidas
 		lineageTag: 89f42d64-98dd-4b8c-970d-653fad48b862
 
 	/// FRP médio (ponderado) em todo o período selecionado nos filtros do relatório, ignorando a quebra por mês do visual. Valor principal do cartão Deneb.
-	measure 'FRP Médio Período' = CALCULATE ( [FRP Médio], ALLSELECTED ( dim_calendario ) )
+	measure 'FRP Médio Período' =
+			IF (
+			    ISBLANK ( [Total de Focos] ),
+			    BLANK (),
+			    CALCULATE ( [FRP Médio], ALLSELECTED ( dim_calendario ) )
+			)
 		formatString: #,0.0
 		displayFolder: Intensidade
 		lineageTag: da29deb6-2aa9-4d85-bf51-ae624b767322

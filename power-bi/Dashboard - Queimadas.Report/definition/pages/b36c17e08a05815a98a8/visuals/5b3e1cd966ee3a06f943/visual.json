@@ -1,0 +1,260 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "5b3e1cd966ee3a06f943",
+  "position": {
+    "x": 976,
+    "y": 96,
+    "z": 6,
+    "height": 192,
+    "width": 432,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_calendario"
+                    }
+                  },
+                  "Property": "Mês/Ano"
+                }
+              },
+              "queryRef": "dim_calendario.Mês/Ano",
+              "nativeQueryRef": "Mês/Ano"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_calendario"
+                    }
+                  },
+                  "Property": "Ano Mês Num"
+                }
+              },
+              "queryRef": "dim_calendario.Ano Mês Num",
+              "nativeQueryRef": "Ano Mês Num"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Risco Crítico"
+                }
+              },
+              "queryRef": "_Medidas.% Risco Crítico",
+              "nativeQueryRef": "% Risco Crítico"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Risco Crítico Ano Anterior"
+                }
+              },
+              "queryRef": "_Medidas.% Risco Crítico Ano Anterior",
+              "nativeQueryRef": "% Risco Crítico Ano Anterior"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Risco Crítico Período"
+                }
+              },
+              "queryRef": "_Medidas.% Risco Crítico Período",
+              "nativeQueryRef": "% Risco Crítico Período"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vega'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n \"$schema\": \"https://vega.github.io/schema/vega/v5.json\",\n \"description\": \"Percentual de focos classificados como risco de fogo Critico no periodo, com serie mensal, linha da media do periodo e variacao em pontos percentuais do ultimo mes contra o mesmo mes do ano anterior. Maior = pior.\",\n \"padding\": 0,\n \"config\": {\n  \"view\": {\n   \"stroke\": null\n  },\n  \"text\": {\n   \"font\": \"Din\"\n  }\n },\n \"data\": [\n  {\n   \"name\": \"dataset\"\n  },\n  {\n   \"name\": \"series\",\n   \"source\": \"dataset\",\n   \"transform\": [\n    {\n     \"type\": \"formula\",\n     \"as\": \"label\",\n     \"expr\": \"datum[''Mês/Ano'']\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"ord\",\n     \"expr\": \"datum[''Ano Mês Num'']\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"val\",\n     \"expr\": \"datum[''% Risco Crítico'']\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"prev\",\n     \"expr\": \"datum[''% Risco Crítico Ano Anterior'']\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"tot\",\n     \"expr\": \"datum[''% Risco Crítico Período'']\"\n    },\n    {\n     \"type\": \"filter\",\n     \"expr\": \"isValid(datum.val) && isValid(datum.ord)\"\n    },\n    {\n     \"type\": \"collect\",\n     \"sort\": {\n      \"field\": \"ord\",\n      \"order\": \"ascending\"\n     }\n    },\n    {\n     \"type\": \"window\",\n     \"ops\": [\n      \"row_number\"\n     ],\n     \"as\": [\n      \"idx\"\n     ]\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"diff\",\n     \"expr\": \"isValid(datum.prev) ? datum.val - datum.prev : null\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"dText\",\n     \"expr\": \"isValid(datum.diff) ? pbiFormat(datum.diff * 100, ''+0.0;-0.0;0.0'') + '' p.p.'' : ''''\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"valText\",\n     \"expr\": \"pbiFormat(datum.val, ''0.0%'') + ''''\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"prevText\",\n     \"expr\": \"isValid(datum.prev) ? pbiFormat(datum.prev, ''0.0%'') + '''' : ''sem dados''\"\n    }\n   ]\n  },\n  {\n   \"name\": \"agg\",\n   \"source\": \"series\",\n   \"transform\": [\n    {\n     \"type\": \"aggregate\",\n     \"fields\": [\n      \"ord\",\n      \"ord\",\n      \"tot\"\n     ],\n     \"ops\": [\n      \"min\",\n      \"max\",\n      \"max\"\n     ],\n     \"as\": [\n      \"ordMin\",\n      \"ordMax\",\n      \"totVal\"\n     ]\n    },\n    {\n     \"type\": \"lookup\",\n     \"from\": \"series\",\n     \"key\": \"ord\",\n     \"fields\": [\n      \"ordMin\"\n     ],\n     \"values\": [\n      \"label\"\n     ],\n     \"as\": [\n      \"labelIni\"\n     ]\n    },\n    {\n     \"type\": \"lookup\",\n     \"from\": \"series\",\n     \"key\": \"ord\",\n     \"fields\": [\n      \"ordMax\"\n     ],\n     \"values\": [\n      \"label\",\n      \"val\",\n      \"prev\",\n      \"diff\",\n      \"dText\",\n      \"valText\"\n     ],\n     \"as\": [\n      \"labelFim\",\n      \"valLast\",\n      \"prevLast\",\n      \"diffLast\",\n      \"dTextLast\",\n      \"lastText\"\n     ]\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"hasMom\",\n     \"expr\": \"isValid(datum.diffLast)\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"dir\",\n     \"expr\": \"!isValid(datum.diffLast) ? 0 : (datum.diffLast > 0 ? 1 : (datum.diffLast < 0 ? -1 : 0))\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"stateColor\",\n     \"expr\": \"datum.dir > 0 ? cNegative : (datum.dir < 0 ? cPositive : cNeutral)\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"totalText\",\n     \"expr\": \"pbiFormat(datum.totVal, ''0.0%'') + ''''\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"deltaText\",\n     \"expr\": \"!datum.hasMom ? ''Sem comparação'' : ((datum.dir > 0 ? ''▲ '' : (datum.dir < 0 ? ''▼ '' : ''● '')) + datum.dTextLast)\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"periodText\",\n     \"expr\": \"datum.labelIni == datum.labelFim ? datum.labelIni : datum.labelIni + '' a '' + datum.labelFim\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"sparkRight\",\n     \"expr\": \"datum.labelFim + ''  ·  '' + datum.lastText\"\n    },\n    {\n     \"type\": \"formula\",\n     \"as\": \"subText\",\n     \"expr\": \"datum.labelFim + '' vs. '' + substring(datum.labelFim, 0, 4) + (toNumber(substring(datum.labelFim, 4)) - 1)\"\n    },\n    {\n     \"type\": \"filter\",\n     \"expr\": \"length(data(''series'')) > 0\"\n    }\n   ]\n  },\n  {\n   \"name\": \"lastPoint\",\n   \"source\": \"series\",\n   \"transform\": [\n    {\n     \"type\": \"filter\",\n     \"expr\": \"datum.idx === length(data(''series''))\"\n    }\n   ]\n  },\n  {\n   \"name\": \"emptyState\",\n   \"values\": [\n    {\n     \"k\": 1\n    }\n   ],\n   \"transform\": [\n    {\n     \"type\": \"filter\",\n     \"expr\": \"length(data(''series'')) === 0\"\n    }\n   ]\n  }\n ],\n \"signals\": [\n  {\n   \"name\": \"cText\",\n   \"value\": \"#F4F6F8\"\n  },\n  {\n   \"name\": \"cTextMuted\",\n   \"value\": \"#AEB6C2\"\n  },\n  {\n   \"name\": \"cSurface\",\n   \"value\": \"#15191F\"\n  },\n  {\n   \"name\": \"cSurface2\",\n   \"value\": \"#1D232B\"\n  },\n  {\n   \"name\": \"cBorder\",\n   \"value\": \"#2A323C\"\n  },\n  {\n   \"name\": \"cAccent\",\n   \"value\": \"#5BC0EB\"\n  },\n  {\n   \"name\": \"cPositive\",\n   \"value\": \"#3DDC97\"\n  },\n  {\n   \"name\": \"cNegative\",\n   \"value\": \"#FF6B6B\"\n  },\n  {\n   \"name\": \"cNeutral\",\n   \"value\": \"#9AA5B1\"\n  },\n  {\n   \"name\": \"fs\",\n   \"update\": \"max(0.8, min(1.2, min(width / 520, height / 200)))\"\n  },\n  {\n   \"name\": \"pad\",\n   \"update\": \"max(12, min(22, width * 0.035))\"\n  },\n  {\n   \"name\": \"gap\",\n   \"update\": \"max(8, min(14, width * 0.02))\"\n  },\n  {\n   \"name\": \"radius\",\n   \"update\": \"max(10, min(18, height * 0.1))\"\n  },\n  {\n   \"name\": \"stacked\",\n   \"update\": \"width < 360 || height > width * 0.85\"\n  },\n  {\n   \"name\": \"innerW\",\n   \"update\": \"max(0, width - 2 * pad)\"\n  },\n  {\n   \"name\": \"innerH\",\n   \"update\": \"max(0, height - 2 * pad)\"\n  },\n  {\n   \"name\": \"zoneAw\",\n   \"update\": \"stacked ? innerW : round(innerW * 0.46)\"\n  },\n  {\n   \"name\": \"zoneAh\",\n   \"update\": \"stacked ? round(innerH * 0.56) : innerH\"\n  },\n  {\n   \"name\": \"zoneBx\",\n   \"update\": \"stacked ? pad : pad + zoneAw + gap\"\n  },\n  {\n   \"name\": \"zoneBy\",\n   \"update\": \"stacked ? pad + zoneAh + gap : pad\"\n  },\n  {\n   \"name\": \"zoneBw\",\n   \"update\": \"stacked ? innerW : innerW - zoneAw - gap\"\n  },\n  {\n   \"name\": \"zoneBh\",\n   \"update\": \"stacked ? innerH - zoneAh - gap : innerH\"\n  },\n  {\n   \"name\": \"fsLabel\",\n   \"update\": \"max(10, 11 * fs)\"\n  },\n  {\n   \"name\": \"fsMicro\",\n   \"update\": \"max(10, 11 * fs)\"\n  },\n  {\n   \"name\": \"fsDelta\",\n   \"update\": \"max(12, 13 * fs)\"\n  },\n  {\n   \"name\": \"bigSize\",\n   \"update\": \"max(24, min(56, min(zoneAw * 0.2, zoneAh * 0.32)))\"\n  },\n  {\n   \"name\": \"bigY\",\n   \"update\": \"pad + fsLabel + 8\"\n  },\n  {\n   \"name\": \"periodY\",\n   \"update\": \"bigY + bigSize + 8\"\n  },\n  {\n   \"name\": \"pillH\",\n   \"update\": \"max(20, 22 * fs)\"\n  },\n  {\n   \"name\": \"pillY\",\n   \"update\": \"pad + zoneAh - pillH\"\n  },\n  {\n   \"name\": \"showPeriod\",\n   \"update\": \"periodY + fsMicro + 6 <= pillY - 4\"\n  },\n  {\n   \"name\": \"showSparkLabel\",\n   \"update\": \"zoneBh >= 90\"\n  },\n  {\n   \"name\": \"showSparkTitle\",\n   \"update\": \"zoneBw >= 260\"\n  },\n  {\n   \"name\": \"sparkX0\",\n   \"update\": \"zoneBx + gap + 2\"\n  },\n  {\n   \"name\": \"sparkX1\",\n   \"update\": \"zoneBx + zoneBw - gap - 2\"\n  },\n  {\n   \"name\": \"sparkY0\",\n   \"update\": \"zoneBy + gap + (showSparkLabel ? fsMicro + 10 : 6)\"\n  },\n  {\n   \"name\": \"sparkY1\",\n   \"update\": \"zoneBy + zoneBh - gap\"\n  },\n  {\n   \"name\": \"nSeries\",\n   \"update\": \"length(data(''series''))\"\n  },\n  {\n   \"name\": \"hitW\",\n   \"update\": \"(sparkX1 - sparkX0) / max(1, nSeries - 1)\"\n  }\n ],\n \"scales\": [\n  {\n   \"name\": \"xs\",\n   \"type\": \"linear\",\n   \"domain\": [\n    {\n     \"signal\": \"nSeries == 1 ? 0 : 1\"\n    },\n    {\n     \"signal\": \"nSeries == 1 ? 2 : max(1, nSeries)\"\n    }\n   ],\n   \"range\": [\n    {\n     \"signal\": \"sparkX0\"\n    },\n    {\n     \"signal\": \"sparkX1\"\n    }\n   ]\n  },\n  {\n   \"name\": \"ys\",\n   \"type\": \"linear\",\n   \"zero\": true,\n   \"nice\": false,\n   \"domain\": {\n    \"data\": \"series\",\n    \"fields\": [\n     \"val\",\n     \"tot\"\n    ]\n   },\n   \"range\": [\n    {\n     \"signal\": \"sparkY1\"\n    },\n    {\n     \"signal\": \"sparkY0\"\n    }\n   ]\n  }\n ],\n \"marks\": [\n  {\n   \"name\": \"shadow\",\n   \"type\": \"rect\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"value\": 3\n     },\n     \"y\": {\n      \"value\": 3\n     },\n     \"width\": {\n      \"signal\": \"max(0, width - 3)\"\n     },\n     \"height\": {\n      \"signal\": \"max(0, height - 3)\"\n     },\n     \"cornerRadius\": {\n      \"signal\": \"radius\"\n     },\n     \"fill\": {\n      \"value\": \"#000000\"\n     },\n     \"fillOpacity\": {\n      \"value\": 0.28\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"surface\",\n   \"type\": \"rect\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"value\": 0\n     },\n     \"y\": {\n      \"value\": 0\n     },\n     \"width\": {\n      \"signal\": \"max(0, width - 3)\"\n     },\n     \"height\": {\n      \"signal\": \"max(0, height - 3)\"\n     },\n     \"cornerRadius\": {\n      \"signal\": \"radius\"\n     },\n     \"fill\": {\n      \"signal\": \"cSurface\"\n     },\n     \"stroke\": {\n      \"signal\": \"cBorder\"\n     },\n     \"strokeWidth\": {\n      \"value\": 1\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"sparkPanel\",\n   \"type\": \"rect\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"zoneBx\"\n     },\n     \"y\": {\n      \"signal\": \"zoneBy\"\n     },\n     \"width\": {\n      \"signal\": \"max(0, zoneBw)\"\n     },\n     \"height\": {\n      \"signal\": \"max(0, zoneBh)\"\n     },\n     \"cornerRadius\": {\n      \"signal\": \"radius * 0.6\"\n     },\n     \"fill\": {\n      \"signal\": \"cSurface2\"\n     },\n     \"fillOpacity\": {\n      \"signal\": \"nSeries > 0 ? 1 : 0\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"sparkTitle\",\n   \"type\": \"text\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"zoneBx + gap + 2\"\n     },\n     \"y\": {\n      \"signal\": \"zoneBy + gap\"\n     },\n     \"text\": {\n      \"signal\": \"showSparkLabel && showSparkTitle ? ''Evolução mensal'' : ''''\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsMicro\"\n     },\n     \"fontWeight\": {\n      \"value\": 600\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"sparkLastLabel\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"zoneBx + zoneBw - gap - 2\"\n     },\n     \"y\": {\n      \"signal\": \"zoneBy + gap\"\n     },\n     \"text\": {\n      \"signal\": \"showSparkLabel ? datum.sparkRight : ''''\"\n     },\n     \"align\": {\n      \"value\": \"right\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsMicro\"\n     },\n     \"limit\": {\n      \"signal\": \"max(0, zoneBw - 2 * gap - 4)\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"sparkArea\",\n   \"type\": \"area\",\n   \"from\": {\n    \"data\": \"series\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"scale\": \"xs\",\n      \"field\": \"idx\"\n     },\n     \"y\": {\n      \"scale\": \"ys\",\n      \"field\": \"val\"\n     },\n     \"y2\": {\n      \"signal\": \"sparkY1\"\n     },\n     \"interpolate\": {\n      \"value\": \"monotone\"\n     },\n     \"fill\": {\n      \"signal\": \"cAccent\"\n     },\n     \"fillOpacity\": {\n      \"value\": 0.14\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"avgLine\",\n   \"type\": \"rule\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"sparkX0\"\n     },\n     \"x2\": {\n      \"signal\": \"sparkX1\"\n     },\n     \"y\": {\n      \"signal\": \"scale(''ys'', datum.totVal)\"\n     },\n     \"stroke\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"strokeDash\": {\n      \"value\": [\n       4,\n       3\n      ]\n     },\n     \"strokeWidth\": {\n      \"value\": 1\n     },\n     \"strokeOpacity\": {\n      \"value\": 0.75\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"sparkLine\",\n   \"type\": \"line\",\n   \"from\": {\n    \"data\": \"series\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"scale\": \"xs\",\n      \"field\": \"idx\"\n     },\n     \"y\": {\n      \"scale\": \"ys\",\n      \"field\": \"val\"\n     },\n     \"interpolate\": {\n      \"value\": \"monotone\"\n     },\n     \"stroke\": {\n      \"signal\": \"cAccent\"\n     },\n     \"strokeWidth\": {\n      \"value\": 2\n     },\n     \"strokeCap\": {\n      \"value\": \"round\"\n     },\n     \"strokeJoin\": {\n      \"value\": \"round\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"avgLabelBg\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"sparkX1\"\n     },\n     \"y\": {\n      \"signal\": \"scale(''ys'', datum.totVal) + (scale(''ys'', datum.totVal) < sparkY0 + 14 ? 3 : -3)\"\n     },\n     \"text\": {\n      \"signal\": \"showSparkLabel ? ''média do período'' : ''''\"\n     },\n     \"align\": {\n      \"value\": \"right\"\n     },\n     \"baseline\": {\n      \"signal\": \"scale(''ys'', datum.totVal) < sparkY0 + 14 ? ''top'' : ''bottom''\"\n     },\n     \"fill\": {\n      \"signal\": \"cSurface2\"\n     },\n     \"fontSize\": {\n      \"signal\": \"max(9, fsMicro - 1)\"\n     },\n     \"stroke\": {\n      \"signal\": \"cSurface2\"\n     },\n     \"strokeWidth\": {\n      \"value\": 5\n     },\n     \"strokeJoin\": {\n      \"value\": \"round\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"avgLabel\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"interactive\": false,\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"sparkX1\"\n     },\n     \"y\": {\n      \"signal\": \"scale(''ys'', datum.totVal) + (scale(''ys'', datum.totVal) < sparkY0 + 14 ? 3 : -3)\"\n     },\n     \"text\": {\n      \"signal\": \"showSparkLabel ? ''média do período'' : ''''\"\n     },\n     \"align\": {\n      \"value\": \"right\"\n     },\n     \"baseline\": {\n      \"signal\": \"scale(''ys'', datum.totVal) < sparkY0 + 14 ? ''top'' : ''bottom''\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"max(9, fsMicro - 1)\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"lastHalo\",\n   \"type\": \"symbol\",\n   \"from\": {\n    \"data\": \"lastPoint\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"scale\": \"xs\",\n      \"field\": \"idx\"\n     },\n     \"y\": {\n      \"scale\": \"ys\",\n      \"field\": \"val\"\n     },\n     \"shape\": {\n      \"value\": \"circle\"\n     },\n     \"size\": {\n      \"value\": 280\n     },\n     \"fill\": {\n      \"signal\": \"data(''agg'')[0] ? data(''agg'')[0].stateColor : cNeutral\"\n     },\n     \"fillOpacity\": {\n      \"value\": 0.18\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"lastDot\",\n   \"type\": \"symbol\",\n   \"from\": {\n    \"data\": \"lastPoint\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"scale\": \"xs\",\n      \"field\": \"idx\"\n     },\n     \"y\": {\n      \"scale\": \"ys\",\n      \"field\": \"val\"\n     },\n     \"shape\": {\n      \"value\": \"circle\"\n     },\n     \"size\": {\n      \"value\": 70\n     },\n     \"fill\": {\n      \"signal\": \"data(''agg'')[0] ? data(''agg'')[0].stateColor : cNeutral\"\n     },\n     \"stroke\": {\n      \"signal\": \"cSurface2\"\n     },\n     \"strokeWidth\": {\n      \"value\": 2\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"kpiLabel\",\n   \"type\": \"text\",\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"y\": {\n      \"signal\": \"pad\"\n     },\n     \"text\": {\n      \"value\": \"FOCOS EM RISCO CRÍTICO\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsLabel\"\n     },\n     \"fontWeight\": {\n      \"value\": 600\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"kpiBig\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"y\": {\n      \"signal\": \"bigY\"\n     },\n     \"text\": {\n      \"field\": \"totalText\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cText\"\n     },\n     \"fontSize\": {\n      \"signal\": \"max(18, min(bigSize, zoneAw / (length(datum.totalText) * 0.64)))\"\n     },\n     \"fontWeight\": {\n      \"value\": 700\n     },\n     \"limit\": {\n      \"signal\": \"zoneAw\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"kpiPeriod\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"y\": {\n      \"signal\": \"periodY\"\n     },\n     \"text\": {\n      \"signal\": \"showPeriod ? datum.periodText : ''''\"\n     },\n     \"baseline\": {\n      \"value\": \"top\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsMicro\"\n     },\n     \"limit\": {\n      \"signal\": \"zoneAw\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"deltaPill\",\n   \"type\": \"rect\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad\"\n     },\n     \"y\": {\n      \"signal\": \"pillY\"\n     },\n     \"width\": {\n      \"signal\": \"min(zoneAw, length(datum.deltaText) * fsDelta * 0.66 + 18)\"\n     },\n     \"height\": {\n      \"signal\": \"pillH\"\n     },\n     \"cornerRadius\": {\n      \"signal\": \"pillH / 2\"\n     },\n     \"fill\": {\n      \"field\": \"stateColor\"\n     },\n     \"fillOpacity\": {\n      \"value\": 0.16\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"deltaText\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad + 10\"\n     },\n     \"y\": {\n      \"signal\": \"pillY + pillH / 2 + 1\"\n     },\n     \"text\": {\n      \"field\": \"deltaText\"\n     },\n     \"baseline\": {\n      \"value\": \"middle\"\n     },\n     \"fill\": {\n      \"field\": \"stateColor\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsDelta\"\n     },\n     \"fontWeight\": {\n      \"value\": 700\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"deltaSub\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"agg\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"pad + min(zoneAw, length(datum.deltaText) * fsDelta * 0.66 + 18) + 8\"\n     },\n     \"y\": {\n      \"signal\": \"pillY + pillH / 2 + 1\"\n     },\n     \"text\": {\n      \"signal\": \"!datum.hasMom ? '''' : ((zoneAw - (length(datum.deltaText) * fsDelta * 0.62 + 18) - 8) >= length(datum.subText) * fsMicro * 0.62 ? datum.subText : ((zoneAw - (length(datum.deltaText) * fsDelta * 0.62 + 18) - 8) >= 16 * fsMicro * 0.62 ? ''vs. ano anterior'' : ''''))\"\n     },\n     \"baseline\": {\n      \"value\": \"middle\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"fsMicro\"\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"hitAreas\",\n   \"type\": \"rect\",\n   \"from\": {\n    \"data\": \"series\"\n   },\n   \"encode\": {\n    \"enter\": {\n     \"fill\": {\n      \"value\": \"#FFFFFF\"\n     },\n     \"cursor\": {\n      \"value\": \"default\"\n     }\n    },\n    \"update\": {\n     \"x\": {\n      \"signal\": \"scale(''xs'', datum.idx) - hitW / 2\"\n     },\n     \"width\": {\n      \"signal\": \"hitW\"\n     },\n     \"y\": {\n      \"signal\": \"sparkY0 - 4\"\n     },\n     \"height\": {\n      \"signal\": \"max(0, sparkY1 - sparkY0 + 8)\"\n     },\n     \"fillOpacity\": {\n      \"value\": 0\n     },\n     \"tooltip\": {\n      \"signal\": \"{''Período'': datum.label, ''% em risco crítico'': datum.valText, ''Mesmo mês, ano anterior'': datum.prevText, ''Variação'': isValid(datum.diff) ? datum.dText : ''sem comparação''}\"\n     }\n    },\n    \"hover\": {\n     \"fillOpacity\": {\n      \"value\": 0.07\n     }\n    }\n   }\n  },\n  {\n   \"name\": \"emptyMessage\",\n   \"type\": \"text\",\n   \"from\": {\n    \"data\": \"emptyState\"\n   },\n   \"encode\": {\n    \"update\": {\n     \"x\": {\n      \"signal\": \"width / 2\"\n     },\n     \"y\": {\n      \"signal\": \"height / 2\"\n     },\n     \"text\": {\n      \"value\": \"Sem dados para o contexto selecionado\"\n     },\n     \"align\": {\n      \"value\": \"center\"\n     },\n     \"baseline\": {\n      \"value\": \"middle\"\n     },\n     \"fill\": {\n      \"signal\": \"cTextMuted\"\n     },\n     \"fontSize\": {\n      \"signal\": \"max(12, 14 * fs)\"\n     },\n     \"limit\": {\n      \"signal\": \"max(0, width - 2 * pad)\"\n     }\n    }\n   }\n  }\n ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"autosize\": {\n    \"contains\": \"padding\",\n    \"type\": \"fit\"\n  },\n  \"view\": {\n    \"stroke\": \"transparent\"\n  },\n  \"font\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n  \"arc\": {},\n  \"area\": {\n    \"line\": true,\n    \"opacity\": 0.6\n  },\n  \"bar\": {},\n  \"line\": {\n    \"strokeWidth\": 3,\n    \"strokeCap\": \"round\",\n    \"strokeJoin\": \"round\"\n  },\n  \"point\": {\n    \"filled\": true,\n    \"size\": 75\n  },\n  \"rect\": {},\n  \"text\": {\n    \"font\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"fontSize\": 12,\n    \"fill\": \"#616161\"\n  },\n  \"axis\": {\n    \"ticks\": false,\n    \"grid\": false,\n    \"domain\": false,\n    \"labelColor\": \"#616161\",\n    \"labelFontSize\": 12,\n    \"titleFont\": \"din, wf_standard-font, helvetica, arial, sans-serif\",\n    \"titleColor\": \"#242424\",\n    \"titleFontSize\": 16,\n    \"titleFontWeight\": \"normal\"\n  },\n  \"axisQuantitative\": {\n    \"tickCount\": 3,\n    \"grid\": true,\n    \"gridColor\": \"#C7C7C7\",\n    \"gridDash\": [\n      1,\n      5\n    ],\n    \"labelFlush\": false\n  },\n  \"axisX\": {\n    \"labelPadding\": 5\n  },\n  \"axisY\": {\n    \"labelPadding\": 10\n  },\n  \"header\": {\n    \"titleFont\": \"din, wf_standard-font, helvetica, arial, sans-serif\",\n    \"titleFontSize\": 16,\n    \"titleColor\": \"#242424\",\n    \"labelFont\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"labelFontSize\": 13.333333333333332,\n    \"labelColor\": \"#616161\"\n  },\n  \"legend\": {\n    \"titleFont\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"titleFontWeight\": \"bold\",\n    \"titleColor\": \"#616161\",\n    \"labelFont\": \"Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif\",\n    \"labelFontSize\": 13.333333333333332,\n    \"labelColor\": \"#616161\",\n    \"symbolType\": \"circle\",\n    \"symbolSize\": 75\n  },\n  \"path\": {},\n  \"shape\": {},\n  \"symbol\": {\n    \"strokeWidth\": 1.5,\n    \"size\": 50\n  }\n}'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenuSelector": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            },
+            "selectionMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'simple'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "182D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "422D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataLimit": [
+        {
+          "properties": {
+            "override": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

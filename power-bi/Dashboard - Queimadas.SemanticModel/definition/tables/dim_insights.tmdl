@@ -1,0 +1,19 @@
+/// Tabela auxiliar do visual de insights: uma linha por insight (1 a 5). Não se relaciona com outras tabelas.
+table dim_insights
+	lineageTag: 1354c4d6-2cd8-48ef-839f-3bfaf1072af2
+
+	column Id
+		dataType: int64
+		formatString: 0
+		lineageTag: fdc1a8e2-12c6-4b4c-8b9d-a2f48d74c8e4
+		summarizeBy: none
+		sourceColumn: Id
+
+	partition dim_insights = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows({{1}, {2}, {3}, {4}, {5}}, type table [Id = Int64.Type])
+				in
+				    Fonte
+
