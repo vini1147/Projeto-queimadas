@@ -9,7 +9,7 @@ table rls_email_estado
 
 		annotation SummarizationSetBy = Automatic
 
-	column email = "user-" & LOWER(SUBSTITUTE(rls_email_estado[estado]," ","-")) & "@onmicrosoft.com"
+	column email = "user-" & LOWER(SUBSTITUTE(rls_email_estado[estado]," ","-")) & "@vinanda0908.onmicrosoft.com"
 		lineageTag: 3e962db3-6867-42da-a110-c3fdaba0bdea
 		summarizeBy: none
 
