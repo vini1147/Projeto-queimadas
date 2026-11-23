@@ -1614,10 +1614,6 @@
           "type": "arrow"
         },
         {
-          "id": "APY1tNVijxZsmbxnP2YJs",
-          "type": "arrow"
-        },
-        {
           "id": "Kjdr-X369kLjmSzWsSafu",
           "type": "arrow"
         }
@@ -6098,8 +6094,8 @@
     },
     {
       "type": "text",
-      "version": 1448,
-      "versionNonce": 627528156,
+      "version": 1522,
+      "versionNonce": 1505959484,
       "isDeleted": false,
       "id": "SK_3T15VVJBErVI2rYjkj",
       "fillStyle": "solid",
@@ -6108,12 +6104,12 @@
       "roughness": 1,
       "opacity": 100,
       "angle": 0,
-      "x": 920.7573738523399,
+      "x": 909.1494026609337,
       "y": 75.5294831065429,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "#1595d5",
-      "width": 144.67189025878906,
-      "height": 20,
+      "width": 163.60211835588686,
+      "height": 40,
       "seed": 1627630948,
       "groupIds": [
         "4_2qKJi8IuporFXyIW5LP",
@@ -6122,20 +6118,20 @@
       "frameId": null,
       "roundness": null,
       "boundElements": [],
-      "updated": 1795056497431,
+      "updated": 1795474987903,
       "link": null,
       "locked": false,
       "fontSize": 16,
       "fontFamily": 1,
-      "text": "Power BI Desktop",
+      "text": "Dashboard -\nQueimadas .pbib",
       "textAlign": "center",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Power BI Desktop",
+      "originalText": "Dashboard - Queimadas .pbib",
       "lineHeight": 1.25,
       "baseline": 14,
       "index": "b0r",
-      "autoResize": true,
+      "autoResize": false,
       "created": 1794278866595,
       "labelPosition": null,
       "baseFontSize": null
@@ -6236,7 +6232,7 @@
       "version": 1170,
       "versionNonce": 1977756709,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1795136256667,
       "created": 1794278954376,
       "link": null,
