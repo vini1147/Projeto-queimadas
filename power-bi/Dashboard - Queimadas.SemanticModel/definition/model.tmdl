@@ -18,6 +18,10 @@ ref table dim_hora
 ref table dim_calendario
 ref table _Medidas
 ref table dim_insights
+ref table rls_email_estado
+
+ref role Acesso_Total
+ref role Acesso_Estados
 
 ref cultureInfo pt-BR
 

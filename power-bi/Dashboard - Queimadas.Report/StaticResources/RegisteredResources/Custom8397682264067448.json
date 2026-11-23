@@ -1,0 +1,55 @@
+{
+  "name": "Custom",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "transparency": 100
+          }
+        ],
+        "filterCard": [
+          {
+            "$id": "Available",
+            "fontFamily": "wf_standard-font, helvetica, arial, sans-serif",
+            "foregroundColor": {
+              "solid": {
+                "color": "#e6e6e6"
+              }
+            }
+          }
+        ],
+        "outspacePane": [
+          {
+            "foregroundColor": {
+              "solid": {
+                "color": "#e6e6e6"
+              }
+            },
+            "fontFamily": "wf_standard-font, helvetica, arial, sans-serif"
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FAFAFA"
+              }
+            },
+            "transparency": 14
+          }
+        ]
+      }
+    }
+  },
+  "textClasses": {
+    "label": {
+      "fontFace": "wf_standard-font, helvetica, arial, sans-serif",
+      "color": "#e6e6e6"
+    }
+  }
+}

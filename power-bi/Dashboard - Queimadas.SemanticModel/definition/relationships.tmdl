@@ -6,3 +6,7 @@ relationship gold_queimadas_data_pas_dim_calendario_Data
 	fromColumn: gold_queimadas.data_pas
 	toColumn: dim_calendario.Data
 
+relationship b49843c6-a1a8-1470-9d7e-b330fd759dc7
+	fromColumn: gold_queimadas.estado
+	toColumn: rls_email_estado.estado
+

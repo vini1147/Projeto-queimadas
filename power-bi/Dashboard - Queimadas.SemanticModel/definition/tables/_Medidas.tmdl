@@ -353,6 +353,10 @@ table _Medidas
 		displayFolder: Insights
 		lineageTag: 0bad8266-f47c-4eb4-8862-888387242404
 
+	measure username = "Seja bem vindo " & USERNAME()
+		displayFolder: RLS
+		lineageTag: e9862f98-3249-43f8-b779-a59352907869
+
 	column Coluna
 		dataType: string
 		isHidden

@@ -1,0 +1,25 @@
+table rls_email_estado
+	lineageTag: 0dcef6db-37f3-4b25-a391-816b0710d1c3
+
+	column estado
+		lineageTag: da9bd0d5-c850-4ef7-b52f-3e3ba7721fbe
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: gold_queimadas[estado]
+
+		annotation SummarizationSetBy = Automatic
+
+	column email = "user-" & LOWER(SUBSTITUTE(rls_email_estado[estado]," ","-")) & "@onmicrosoft.com"
+		lineageTag: 3e962db3-6867-42da-a110-c3fdaba0bdea
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition rls_email_estado = calculated
+		mode: import
+		source =
+				
+				DISTINCT( gold_queimadas[estado] )
+
+	annotation PBI_Id = caf550e19693420bbbf51f7fd330450e
+

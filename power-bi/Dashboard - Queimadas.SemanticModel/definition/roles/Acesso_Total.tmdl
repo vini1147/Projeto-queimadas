@@ -1,0 +1,6 @@
+/// Sem filtro de linhas: vê todos os estados. Para quem precisa da visão nacional (não combine com RLS_Estado se quiser restringir).
+role Acesso_Total
+	modelPermission: read
+
+	annotation PBI_Id = 55f09a7ac33642528565896c0d27722b
+

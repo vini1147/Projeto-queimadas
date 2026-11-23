@@ -1,0 +1,7 @@
+role Acesso_Estados
+	modelPermission: read
+
+	tablePermission rls_email_estado = rls_email_estado[email] = USERNAME()
+
+	annotation PBI_Id = 8180dbd289dd4e1da6a33f698756b15b
+
